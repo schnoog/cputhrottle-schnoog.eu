@@ -17,7 +17,6 @@ jobs:
         run: |
           mkdir cputhrottle@schnoog.eu
           cp -r ./* ./cputhrottle@schnoog.eu/
-          cp -r ./.??* ./cputhrottle@schnoog.eu/  # This copies hidden files (like .gitignore)
 
       - name: Zip the Directory
         run: |
