@@ -9,11 +9,11 @@ jobs:
 
     steps:
       - name: Set current date as env variable
-        run: echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+        run: echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_OUTPUT
       - name: Echo current date
         run: echo $NOW # Gives "2022-12-11T01:42:20"
       - name: Set zip file variable
-        run: echo "ZFN=CPUThrottleApplet-""$NOW"".zip" >> $GITHUB_ENV
+        run: echo "ZFN=CPUThrottleApplet-""$NOW"".zip" >> $GITHUB_OUTPUT
       - name: Echo zip file name
         run: echo $ZFN # Gives "2022-12-11T01:42:20"
 
