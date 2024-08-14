@@ -15,7 +15,7 @@ jobs:
       - name: Create Directory and Move Files
         run: |
           mkdir cputhrottle@schnoog.eu
-          cp -r ./* ./cputhrottle@schnoog.eu/
+          cp -r ./* ./cputhrottle@schnoog.eu/ 2>/dev/null
 
       - name: Zip the Directory
         run: |
