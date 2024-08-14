@@ -21,7 +21,7 @@ MyApplet.prototype = {
         this.menuManager = new PopupMenu.PopupMenuManager(this);
         this.menu = new Applet.AppletPopupMenu(this, orientation);
         this.menuManager.addMenu(this.menu);
-        this.ThrottleBin = '/home/shared/scripts/CPUThrottle/ThrottleCPU.sh';
+        this.ThrottleBin = GLib.get_home_dir() + '/.local/share/cinnamon/applets/cputhrottle@schnoog.eu/ThrottleCPU.sh';
         this._loadCPULevels();
     },
 
