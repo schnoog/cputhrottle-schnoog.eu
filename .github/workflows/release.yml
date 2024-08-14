@@ -10,13 +10,13 @@ jobs:
     steps:
       - name: Set current date as env variable
         run: echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_OUTPUT
-        id: nowset
+        
       - name: Echo current date
         run: echo $NOW # Gives "2022-12-11T01:42:20"
         
       - name: Set zip file variable
         run: echo "ZFN=CPUThrottleApplet-""$NOW"".zip" >> $GITHUB_OUTPUT
-        id: zfnset
+        
       - name: Echo zip file name
         run: echo $ZFN # Gives "2022-12-11T01:42:20"
         
@@ -42,8 +42,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name:  ${{ steps.nowset.outputs.NOW }}
-          release_name: ${{ steps.nowset.outputs.NOW }}
+          tag_name:  ${{ steps.outputs.NOW }}
+          release_name: ${{ steps.outputs.NOW }}
           draft: false
           prerelease: false
 
@@ -53,6 +53,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.zfnset.outputs.ZFN }}
-          asset_name: ${{ steps.zfnset.outputs.ZFN }}
+          asset_path: ${{ steps.outputs.ZFN }}
+          asset_name: ${{ steps.outputs.ZFN }}
           asset_content_type: application/zip
