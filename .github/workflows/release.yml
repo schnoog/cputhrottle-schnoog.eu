@@ -14,6 +14,8 @@ jobs:
         run: echo $NOW # Gives "2022-12-11T01:42:20"
       - name: Set zip file variable
         run: echo "ZFN=CPUThrottleApplet-$(date +'%Y-%m-%dT%H:%M').zip" >> $GITHUB_ENV
+      - name: Echo zip file name
+        run: echo $ZFN # Gives "2022-12-11T01:42:20"
 
 
         
