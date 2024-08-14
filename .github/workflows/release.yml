@@ -8,6 +8,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set current date as env variable
+        run: echo "NOW=$(date +'%Y-%m-%dT%H:%M')" >> $GITHUB_ENV
+      - name: Echo current date
+        run: echo $NOW # Gives "2022-12-11T01:42:20"
+      - name: Set zip file variable
+        run: echo "ZFN=CPUThrottleApplet-$(date +'%Y-%m-%dT%H:%M').zip" >> $GITHUB_ENV
+
+
+        
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -20,7 +29,7 @@ jobs:
 
       - name: Zip the Directory
         run: |
-          zip -r cputhrottle_schnoog_eu.zip cputhrottle@schnoog.eu
+          zip -r ${{ env.ZFN }} cputhrottle@schnoog.eu
 
       - name: Create GitHub Release
         id: create_release
@@ -28,8 +37,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name:  ${{ github.ref }}
-          release_name: ${{ github.ref }}
+          tag_name:  ${{ env.NOW }}
+          release_name: ${{ env.NOW }}
           draft: false
           prerelease: false
 
@@ -39,6 +48,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./cputhrottle_schnoog_eu.zip
-          asset_name: cputhrottle_schnoog_eu.zip
+          asset_path: ./${{ env.ZFN }}
+          asset_name: ${{ env.ZFN }}
           asset_content_type: application/zip
