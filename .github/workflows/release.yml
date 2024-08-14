@@ -39,8 +39,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name:  ${{$NOW}}
-          release_name: ${{$NOW}}
+          tag_name:  ${{ NOW }}
+          release_name: ${{ NOW }}
           draft: false
           prerelease: false
 
@@ -50,6 +50,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ZFN}}
-          asset_name: ${{ZFN}}
+          asset_path: ${{ ZFN }}
+          asset_name: ${{ ZFN }}
           asset_content_type: application/zip
