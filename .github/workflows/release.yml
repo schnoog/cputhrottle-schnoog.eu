@@ -1,7 +1,7 @@
 name: Package Repository on Tag
 
 on:
-  push:
+  pushxxxx:
 
 jobs:
   build:
