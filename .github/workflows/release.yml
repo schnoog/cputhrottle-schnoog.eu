@@ -2,8 +2,7 @@ name: Package Repository on Tag
 
 on:
   push:
-    tags:
-      - '*'
+
 
 jobs:
   build:
