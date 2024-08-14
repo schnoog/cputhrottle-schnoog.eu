@@ -29,7 +29,7 @@ jobs:
 
       - name: Zip the Directory
         run: |
-          zip -r ${{ env.ZFN }} cputhrottle@schnoog.eu
+          zip -r $ZFN cputhrottle@schnoog.eu
 
       - name: Create GitHub Release
         id: create_release
@@ -37,8 +37,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name:  ${{ env.NOW }}
-          release_name: ${{ env.NOW }}
+          tag_name:  $NOW
+          release_name: $NOW
           draft: false
           prerelease: false
 
@@ -48,6 +48,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.ZFN }}
-          asset_name: ${{ env.ZFN }}
+          asset_path: ./$ZFN
+          asset_name: $env.ZFN
           asset_content_type: application/zip
