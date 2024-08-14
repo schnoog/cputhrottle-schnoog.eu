@@ -1,0 +1,45 @@
+name: Package Repository on Tag
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Create Directory and Move Files
+        run: |
+          mkdir cputhrottle@schnoog.eu
+          cp -r ./* ./cputhrottle@schnoog.eu/
+          cp -r ./.??* ./cputhrottle@schnoog.eu/  # This copies hidden files (like .gitignore)
+
+      - name: Zip the Directory
+        run: |
+          zip -r cputhrottle_schnoog_eu.zip cputhrottle@schnoog.eu
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./cputhrottle_schnoog_eu.zip
+          asset_name: cputhrottle_schnoog_eu.zip
+          asset_content_type: application/zip
