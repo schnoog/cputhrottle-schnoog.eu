@@ -35,11 +35,12 @@ MyApplet.prototype = {
         }
     },
 
+
     _parseAndCreateMenu: function(output) {
         // Extract levels and frequencies
         let lines = output.split('\n');
         let freqMap = {};
-
+    
         let freqSection = false;
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i].trim();
@@ -51,20 +52,21 @@ MyApplet.prototype = {
                 let parts = line.match(/\((\d+)\)\s+(\d+)/);
                 if (parts && parts.length === 3) {
                     let level = parts[1];
-                    let frequency = parts[2];
-                    freqMap[level] = frequency;
+                    let frequencyHz = parseInt(parts[2], 10);
+                    let frequencyGHz = (frequencyHz / 1000000).toFixed(2);  // Convert to GHz and format to 2 decimal places
+                    freqMap[level] = frequencyGHz;
                 }
             }
         }
-
+    
         // Create a submenu for selecting throttle values
         this._sliderMenuItem = new PopupMenu.PopupSubMenuMenuItem(_("Select Throttle Level"));
         this.menu.addMenuItem(this._sliderMenuItem);
-
-        // Create menu items for each level (0 to 8) with frequencies
+    
+        // Create menu items for each level (0 to 8) with frequencies in GHz
         for (let level in freqMap) {
             let frequency = freqMap[level];
-            let label = `Level ${level} (${frequency} Hz)`;
+            let label = `Level ${level} (${frequency} GHz)`;
             let item = new PopupMenu.PopupMenuItem(label);
             item.connect('activate', function() {
                 this._onValueSelected(level);
@@ -72,6 +74,13 @@ MyApplet.prototype = {
             this._sliderMenuItem.menu.addMenuItem(item);
         }
     },
+    
+
+
+
+
+
+
 
     _onValueSelected: function(level) {
         // Execute the script with the selected level as an argument
