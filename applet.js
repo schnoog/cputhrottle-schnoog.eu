@@ -9,20 +9,66 @@ function MyApplet(orientation, panel_height, instance_id) {
 }
 
 MyApplet.prototype = {
-    __proto__: Applet.IconApplet.prototype,
+    __proto__: Applet.TextIconApplet.prototype,
 
     _init: function(orientation, panel_height, instance_id) {
-        Applet.IconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
+        Applet.TextIconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
         
-        this.set_applet_icon_name("cpu-symbolic");
-        this.set_applet_tooltip(_("Click here to throttle CPU"));
+        this.ThrottleBin = GLib.get_home_dir() + '/.local/share/cinnamon/applets/cputhrottle@schnoog.eu/ThrottleCPU.sh';
+        
+        // Initial frequency load
+        this._updateFrequencyLabel();
 
         // Create a popup menu
         this.menuManager = new PopupMenu.PopupMenuManager(this);
         this.menu = new Applet.AppletPopupMenu(this, orientation);
         this.menuManager.addMenu(this.menu);
-        this.ThrottleBin = GLib.get_home_dir() + '/.local/share/cinnamon/applets/cputhrottle@schnoog.eu/ThrottleCPU.sh';
+
         this._loadCPULevels();
+    },
+
+    _updateFrequencyLabel: function() {
+        // Run the script to get the current level index
+        let [success, output] = GLib.spawn_command_line_sync(`${this.ThrottleBin} g`);
+        
+        if (success) {
+            let currentIndex = parseInt(output.toString().trim(), 10);
+
+            // Run the script to get all available frequencies
+            let [successFreq, freqOutput] = GLib.spawn_command_line_sync(this.ThrottleBin);
+
+            if (successFreq) {
+                let lines = freqOutput.toString().split('\n');
+                let freqMap = {};
+                let freqSection = false;
+
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if (line.startsWith("Possible frequencies:")) {
+                        freqSection = true;
+                        continue;
+                    }
+                    if (freqSection && line.match(/^\(\d+\)\s+\d+/)) {
+                        let parts = line.match(/\((\d+)\)\s+(\d+)/);
+                        if (parts && parts.length === 3) {
+                            let level = parseInt(parts[1], 10);
+                            let frequencyHz = parseInt(parts[2], 10);
+                            let frequencyGHz = (frequencyHz / 1000000).toFixed(2);  // Convert to GHz
+                            freqMap[level] = frequencyGHz;
+                        }
+                    }
+                }
+
+                // Get the current frequency in GHz based on the current index
+                let currentFrequencyGHz = freqMap[currentIndex];
+
+                // Set the applet label to display the current frequency in GHz
+                if (currentFrequencyGHz) {
+                    this.set_applet_label(`${currentFrequencyGHz} GHz`);
+                    this.set_applet_tooltip(_("Current CPU Frequency"));
+                }
+            }
+        }
     },
 
     _loadCPULevels: function() {
@@ -35,12 +81,11 @@ MyApplet.prototype = {
         }
     },
 
-
     _parseAndCreateMenu: function(output) {
         // Extract levels and frequencies
         let lines = output.split('\n');
         let freqMap = {};
-    
+
         let freqSection = false;
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i].trim();
@@ -53,16 +98,16 @@ MyApplet.prototype = {
                 if (parts && parts.length === 3) {
                     let level = parts[1];
                     let frequencyHz = parseInt(parts[2], 10);
-                    let frequencyGHz = (frequencyHz / 1000000).toFixed(2);  // Convert to GHz and format to 2 decimal places
+                    let frequencyGHz = (frequencyHz / 1000000).toFixed(2);  // Convert to GHz
                     freqMap[level] = frequencyGHz;
                 }
             }
         }
-    
+
         // Create a submenu for selecting throttle values
         this._sliderMenuItem = new PopupMenu.PopupSubMenuMenuItem(_("Select Throttle Level"));
         this.menu.addMenuItem(this._sliderMenuItem);
-    
+
         // Create menu items for each level (0 to 8) with frequencies in GHz
         for (let level in freqMap) {
             let frequency = freqMap[level];
@@ -74,18 +119,13 @@ MyApplet.prototype = {
             this._sliderMenuItem.menu.addMenuItem(item);
         }
     },
-    
-
-
-
-
-
-
 
     _onValueSelected: function(level) {
         // Execute the script with the selected level as an argument
-        var tmpl = this.ThrottleBin;
-        Util.spawnCommandLine(`${tmpl} ${level}`);
+        Util.spawnCommandLine(`${this.ThrottleBin} ${level}`);
+
+        // Update the applet label to the newly selected frequency
+        this._updateFrequencyLabel();
     },
 
     on_applet_clicked: function() {
