@@ -124,8 +124,8 @@ MyApplet.prototype = {
         // Execute the script with the selected level as an argument
         Util.spawnCommandLine(`${this.ThrottleBin} ${level}`);
 
-        // Update the applet label to the newly selected frequency
-        this._updateFrequencyLabel();
+        // Delay the frequency label update by 3 seconds
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 3000, Lang.bind(this, this._updateFrequencyLabel));
     },
 
     on_applet_clicked: function() {
