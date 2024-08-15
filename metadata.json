@@ -1,6 +1,6 @@
 {
     "uuid": "cputhrottle@schnoog.eu",
     "name": "CPU Throttle",
-    "description": "Multi step CPU Throttling with 3 clicks \n Requirements: \n cpufrequtils (installed) \n sudo rights",
+    "description": "Multi step CPU Throttling with 3 clicks \n Requirements: \n cpufrequtils (installed) \n sudo rights\n add the following line to your sudoers file using the visudo command:\n ALL ALL=NOPASSWD: /usr/bin/cpufreq-set",
     "icon": "icon.png"
 }
