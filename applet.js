@@ -124,6 +124,10 @@ MyApplet.prototype = {
         // Execute the script with the selected level as an argument
         Util.spawnCommandLine(`${this.ThrottleBin} ${level}`);
 
+        // Show "Updating..." to indicate the frequency is being updated
+        this.set_applet_label("Updating...");
+        this.set_applet_tooltip(_("Applying new CPU frequency..."));
+
         // Delay the frequency label update by 3 seconds
         GLib.timeout_add(GLib.PRIORITY_DEFAULT, 3000, Lang.bind(this, this._updateFrequencyLabel));
     },
