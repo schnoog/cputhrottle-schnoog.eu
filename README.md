@@ -2,6 +2,9 @@
 
 Apply 8 different levels of CPU throtteling to you system with 3 clicks in the bar
 
+![Applet at work](applet.jpg)
+
+
 ### Why?
 I know there are other solutions around. But the one with the most levels still only provided 3 options. Since my laptop runs rather hot I want to set the optimal frequency based on what I'm doing. The laptop placed on my legs shouldn't boil me.
 
