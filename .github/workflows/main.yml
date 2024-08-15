@@ -1,27 +1,61 @@
-name: Zip Files
+name: Package Repository on Tag
 
 on:
   push:
 
-
 jobs:
-  zip-files:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-        with:
-          path: 'cputhrottle@schnoog.eu'
-      - name: Create Release
+      - name: Set current date as env variable
+        run: echo "NOW=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+
+      - name: Create Tagname
+        run: echo "TAG=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+        
+      - name: Echo current date
+        run: echo $NOW # Gives "2022-12-11T01:42:20"
+        
+      - name: Set zip file variable
+        run: echo "ZFN=CPUThrottleApplet-""$NOW"".zip" >> $GITHUB_ENV
+        
+      - name: Echo zip file name
+        run: echo $ZFN # Gives "2022-12-11T01:42:20"
+        
+
+        
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Directory and Move Files
+        run: |
+          mkdir cputhrottle@schnoog.eu
+          cp ./*.sh ./cputhrottle@schnoog.eu/
+          cp ./*.js ./cputhrottle@schnoog.eu/
+          cp ./*.json ./cputhrottle@schnoog.eu/
+
+      - name: Zip the Directory
+        run: |
+          zip -r ${{ env.ZFN }} cputhrottle@schnoog.eu
+
+      - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
+          tag_name:  ${{ env.TAG }}
+          release_name: ${{ env.NOW }}
           draft: false
           prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ZFN }}
+          asset_name: ${{ env.ZFN }}
+          asset_content_type: application/zip
