@@ -1,11 +1,7 @@
-name: Release Package of Repository on Tag
-
+name: Package Repository on Tag
 
 on:
   push:
-    # Pattern matched against refs/tags
-    tags:        
-      - '*'           # Push events to every tag not containing /
 
 jobs:
   build:
@@ -28,33 +24,32 @@ jobs:
         run: echo $ZFN # Gives "2022-12-11T01:42:20"
         
 
-########################## CHECKOUT        
+        
       - name: Checkout Repository
         uses: actions/checkout@v4
-########################## MKDIR AND COPY
+
       - name: Create Directory and Move Files
         run: |
           mkdir cputhrottle@schnoog.eu
           cp ./*.sh ./cputhrottle@schnoog.eu/
           cp ./*.js ./cputhrottle@schnoog.eu/
           cp ./*.json ./cputhrottle@schnoog.eu/
-########################## ZIP
+
       - name: Zip the Directory
         run: |
           zip -r ${{ env.ZFN }} cputhrottle@schnoog.eu
 
-########################## CREATE RELEASE
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name:  ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name:  ${{ env.TAG }}
+          release_name: ${{ env.NOW }}
           draft: false
           prerelease: false
-########################## UPLOAD ASSETS
+
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
