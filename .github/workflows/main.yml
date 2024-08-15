@@ -38,6 +38,9 @@ jobs:
           cp ./*.sh ./cputhrottle@schnoog.eu/
           cp ./*.js ./cputhrottle@schnoog.eu/
           cp ./*.json ./cputhrottle@schnoog.eu/
+          cp ./*.md ./cputhrottle@schnoog.eu/
+          cp ./*.png ./cputhrottle@schnoog.eu/
+          cp ./*.jpg ./cputhrottle@schnoog.eu/
 ########################## ZIP
       - name: Zip the Directory
         run: |
