@@ -1,6 +1,6 @@
 {
     "uuid": "cputhrottle@schnoog.eu",
     "name": "CPU Throttle",
-    "description": "CPU Throttling",
+    "description": "Multi step CPU Throttling with 3 clicks \n Requirements: \n cpufrequtils (installed) \n sudo rights",
     "icon": "icon.png"
 }
