@@ -16,6 +16,8 @@ You need a system running cinnamon desktop environment (I use Mint)
 
 You need to have cpufrequtils installed 
 
+You need to have bc installed
+
 You user needs to have the right to use sudo
 
 You need to setup sudo so that cpufreq-set without password prompt.
