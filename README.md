@@ -40,3 +40,13 @@ Download the release zip (each push creates a new one automatically) and extract
 ~/.local/share/cinnamon/applets/
 
 directory 
+
+### Settings
+
+This applet has 2 settings: 
+
+1) Number of throttling steps. Not-throttled (0)......... X = Min CPU frequency
+
+2) Default throttling step to set after the appled is launched (normally at reboot for example)
+
+
