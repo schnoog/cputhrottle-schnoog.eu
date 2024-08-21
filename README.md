@@ -29,7 +29,7 @@ ALL ALL=NOPASSWD: /usr/bin/cpufreq-set
 Each CPU announces its max and min frequency. The script included executes cpufreq-info 
 to gather this information as well as the number of cores the CPU provides.
 
-The range between min and max frequency is then divided through 8 which gives the stepwidth between the different CPU Throtteling level. All frequencies but min and max are rounded.
+The range between min and max frequency is then divided by 8 (or whatever value you define in the applet settings) which gives the stepwidth between the different CPU Throtteling level. All frequencies but min and max are rounded.
 
 This data is made available to the applet, which display these different levels as options in a drop down menue. If an option is selected the new frequency is applied using cpufreq-set.
 
