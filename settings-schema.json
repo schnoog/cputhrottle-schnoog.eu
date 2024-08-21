@@ -1,0 +1,16 @@
+{
+    "configuration": {
+        "type":        "header",
+        "description": "Configuration"
+    },
+    "cpu-steps": {
+        "default":     "8",
+        "type":        "entry",
+        "description": "Number of reduced CPU frequency steps"
+    },
+    "default-step": {
+        "default":     "0",
+        "type":        "entry",
+        "description": "Default throttling (0 = not throttled)"
+    }
+}

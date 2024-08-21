@@ -3,6 +3,22 @@ const PopupMenu = imports.ui.popupMenu;
 const Util = imports.misc.util;
 const Lang = imports.lang;
 const GLib = imports.gi.GLib;
+const Main = imports.ui.main;
+const MessageTray = imports.ui.messageTray;
+const Gettext = imports.gettext;
+const Settings = imports.ui.settings;
+const UUID = 'cputhrottle@schnoog.eu';
+const AppletDir = imports.ui.appletManager.appletMeta[UUID].path;
+
+
+Gettext.bindtextdomain(UUID, GLib.get_home_dir() + '/.local/share/locale')
+
+function _(str) {
+  return Gettext.dgettext(UUID, str);
+}
+
+
+
 
 function MyApplet(orientation, panel_height, instance_id) {
     this._init(orientation, panel_height, instance_id);
@@ -13,9 +29,14 @@ MyApplet.prototype = {
 
     _init: function(orientation, panel_height, instance_id) {
         Applet.TextIconApplet.prototype._init.call(this, orientation, panel_height, instance_id);
+        this.settings = new Settings.AppletSettings(this, UUID, instance_id);
+        this.ThrottleBin = GLib.get_home_dir() + '/.local/share/cinnamon/applets/' + UUID +'/ThrottleCPU.sh';
+
         
-        this.ThrottleBin = GLib.get_home_dir() + '/.local/share/cinnamon/applets/cputhrottle@schnoog.eu/ThrottleCPU.sh';
-        
+        this.settings.bind('default-step', 'defaultStep', this._onDefaultStepChanged);
+        this._applyDefaultStep();
+
+
         // Initial frequency load
         this._updateFrequencyLabel();
 
@@ -23,11 +44,80 @@ MyApplet.prototype = {
         this.menuManager = new PopupMenu.PopupMenuManager(this);
         this.menu = new Applet.AppletPopupMenu(this, orientation);
         this.menuManager.addMenu(this.menu);
-
         this._loadCPULevels();
     },
 
+    _applyDefaultStep: function() {
+        // Use the value from the settings and execute the command
+        let level = this.defaultStep || "0";  // Fallback to "0" if defaultStep is not set
+        Util.spawnCommandLine(`${this.ThrottleBin} ${level}`);
+    },
+
     _updateFrequencyLabel: function() {
+        // Run the script to get the current level index
+        let [success, output] = GLib.spawn_command_line_sync(`${this.ThrottleBin} g`);
+        
+        if (success) {
+            let currentIndex = parseInt(output.toString().trim(), 10);
+    
+            // Check if the parsed index is a valid number
+            if (isNaN(currentIndex)) {
+                // If the value is not a number, set the label to "unknown"
+                this.set_applet_label("unknown");
+                this.set_applet_tooltip(_("Current CPU Frequency"));
+                return;
+            }
+    
+            // Run the script to get all available frequencies
+            let [successFreq, freqOutput] = GLib.spawn_command_line_sync(this.ThrottleBin);
+    
+            if (successFreq) {
+                let lines = freqOutput.toString().split('\n');
+                let freqMap = {};
+                let freqSection = false;
+    
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    if (line.startsWith("Possible frequencies:")) {
+                        freqSection = true;
+                        continue;
+                    }
+                    if (freqSection && line.match(/^\(\d+\)\s+\d+/)) {
+                        let parts = line.match(/\((\d+)\)\s+(\d+)/);
+                        if (parts && parts.length === 3) {
+                            let level = parseInt(parts[1], 10);
+                            let frequencyHz = parseInt(parts[2], 10);
+                            let frequencyGHz = (frequencyHz / 1000000).toFixed(2);  // Convert to GHz
+                            freqMap[level] = frequencyGHz;
+                        }
+                    }
+                }
+    
+                // Get the current frequency in GHz based on the current index
+                let currentFrequencyGHz = freqMap[currentIndex];
+    
+                // Set the applet label to display the current frequency in GHz
+                if (currentFrequencyGHz) {
+                    this.set_applet_label(`${currentFrequencyGHz} GHz`);
+                    this.set_applet_tooltip(_("Current CPU Frequency"));
+                } else {
+                    // If the frequency corresponding to the current index is not found, set the label to "unknown"
+                    this.set_applet_label("unknown");
+                    this.set_applet_tooltip(_("Current CPU Frequency"));
+                }
+            } else {
+                // If the frequency retrieval command fails, set the label to "unknown"
+                this.set_applet_label("unknown");
+                this.set_applet_tooltip(_("Current CPU Frequency"));
+            }
+        } else {
+            // If the initial command fails, set the label to "unknown"
+            this.set_applet_label("unknown");
+            this.set_applet_tooltip(_("Current CPU Frequency"));
+        }
+    },
+
+    _updateFrequencyLabelX: function() {
         // Run the script to get the current level index
         let [success, output] = GLib.spawn_command_line_sync(`${this.ThrottleBin} g`);
         

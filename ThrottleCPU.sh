@@ -1,14 +1,41 @@
 #!/usr/bin/bash
 
+
+
+#/.config/cinnamon/spices/cputhrottle@schnoog.eu/cputhrottle@schnoog.eu.json
+
 IFS="
 "
+
+BSP=$(dirname "$(realpath $0)")
+
+APPLETID=$(basename "$BSP")
+export APPLETSETTINGSFILE="$HOME""/.config/cinnamon/spices/""$APPLETID""/""$APPLETID"".json"
+
+
+
+#echo "$APPLETID -- $APPLETSETTINGSFILE"
+
+
+
+
+FST=8   #Default number of steps -1
+DST=0   #Default step: 0 -> Unthrottled
+if [ -f "$APPLETSETTINGSFILE" ]; then
+    FST=$(grep -A4 'cpu-steps'  "$APPLETSETTINGSFILE" | grep '"value":' | cut -d '"' -f 4 )
+    DST=$(grep -A4 'default-step'  "$APPLETSETTINGSFILE" | grep '"value":' | cut -d '"' -f 4 )
+fi
+
+
+#echo "FST $FST DEF $DST"
+
 
 ############################################################################
 #
 # Start of settings
 #
 ############################################################################
-export FREQSTEPSCOUNT=8
+export FREQSTEPSCOUNT=$FST
 ############################################################################
 #
 # End of settings
