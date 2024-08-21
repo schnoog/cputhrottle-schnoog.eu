@@ -1,6 +1,8 @@
 # CPU Throttle Applet for Cinnamon
 
-Apply 8 different levels of CPU throtteling to you system with 3 clicks in the bar
+Apply 8 (by default, you can modify that) different levels of CPU throttling to you system with 3 clicks in the bar.
+
+
 
 ![Applet at work](applet.jpg)
 
