@@ -38,7 +38,7 @@ MyApplet.prototype = {
 
 
         // Initial frequency load
-        this._updateFrequencyLabel();
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 3000, Lang.bind(this, this._updateFrequencyLabel));
 
         // Create a popup menu
         this.menuManager = new PopupMenu.PopupMenuManager(this);
@@ -50,7 +50,9 @@ MyApplet.prototype = {
     _applyDefaultStep: function() {
         // Use the value from the settings and execute the command
         let level = this.defaultStep || "0";  // Fallback to "0" if defaultStep is not set
+        
         Util.spawnCommandLine(`${this.ThrottleBin} ${level}`);
+        //this._updateFrequencyLabel();
     },
 
     _updateFrequencyLabel: function() {
@@ -117,49 +119,6 @@ MyApplet.prototype = {
         }
     },
 
-    _updateFrequencyLabelX: function() {
-        // Run the script to get the current level index
-        let [success, output] = GLib.spawn_command_line_sync(`${this.ThrottleBin} g`);
-        
-        if (success) {
-            let currentIndex = parseInt(output.toString().trim(), 10);
-
-            // Run the script to get all available frequencies
-            let [successFreq, freqOutput] = GLib.spawn_command_line_sync(this.ThrottleBin);
-
-            if (successFreq) {
-                let lines = freqOutput.toString().split('\n');
-                let freqMap = {};
-                let freqSection = false;
-
-                for (let i = 0; i < lines.length; i++) {
-                    let line = lines[i].trim();
-                    if (line.startsWith("Possible frequencies:")) {
-                        freqSection = true;
-                        continue;
-                    }
-                    if (freqSection && line.match(/^\(\d+\)\s+\d+/)) {
-                        let parts = line.match(/\((\d+)\)\s+(\d+)/);
-                        if (parts && parts.length === 3) {
-                            let level = parseInt(parts[1], 10);
-                            let frequencyHz = parseInt(parts[2], 10);
-                            let frequencyGHz = (frequencyHz / 1000000).toFixed(2);  // Convert to GHz
-                            freqMap[level] = frequencyGHz;
-                        }
-                    }
-                }
-
-                // Get the current frequency in GHz based on the current index
-                let currentFrequencyGHz = freqMap[currentIndex];
-
-                // Set the applet label to display the current frequency in GHz
-                if (currentFrequencyGHz) {
-                    this.set_applet_label(`${currentFrequencyGHz} GHz`);
-                    this.set_applet_tooltip(_("Current CPU Frequency"));
-                }
-            }
-        }
-    },
 
     _loadCPULevels: function() {
         // Run the script and capture the output
