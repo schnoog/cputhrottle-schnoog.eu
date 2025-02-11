@@ -10,6 +10,9 @@ Apply 8 (by default, you can modify that) different levels of CPU throttling to 
 ### Why?
 I know there are other solutions around. But the one with the most levels still only provided 3 options. Since my laptop runs rather hot I want to set the optimal frequency based on what I'm doing. The laptop placed on my legs shouldn't boil me.
 
+
+
+
 ### Prerequisites
 
 - You need a system running cinnamon desktop environment (I use Mint)
